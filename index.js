@@ -4,6 +4,8 @@ const morgan = require("morgan");
 const express = require("express");
 const myMiddleware = require("./middleware/my_middleware");
 const config = require("config");
+const normalDebugger = require("debug")("app:normal");
+const dbDebugger = require("debug")("app:db");
 
 const app = express();
 
@@ -21,10 +23,11 @@ if (app.get("env") === "development") {
 
 app.use(myMiddleware);
 
-console.log(`App env is ${app.get("env")}`);
-console.log(`App name is ${config.get("name")}`);
-console.log(`Mail server is ${config.get("mail.host")}`);
-console.log(`Mail server password is ${config.get("mail.password")}`);
+normalDebugger(`App env is ${app.get("env")}`);
+normalDebugger(`App name is ${config.get("name")}`);
+normalDebugger(`Mail server is ${config.get("mail.host")}`);
+normalDebugger(`Mail server password is ${config.get("mail.password")}`);
+dbDebugger("Database debugging ");
 
 app.get("/", (req, res) => {
   res.send("Hello");
