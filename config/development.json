@@ -1,0 +1,7 @@
+{
+  "name": "My Exp App - Dev",
+  "mail": {
+    "host": "dev-mail-server",
+    "password": "1111"
+  }
+}
