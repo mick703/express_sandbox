@@ -5,25 +5,64 @@ mongoose.connect(
   { useNewUrlParser: true }
 );
 const courseSchema = new mongoose.Schema({
-  name: String,
-  tags: [String],
-  author: String,
+  name: {
+    type: String,
+    required: true
+  },
+  tags: {
+    type: Array,
+    validate: {
+      validator: function(v) {
+        return v && v.length > 0;
+      },
+      message: "A course should have at least one tag"
+    }
+  },
+  author: {
+    type: String,
+    validate: {
+      isAsync: true,
+      validator: function(v, cb) {
+        setTimeout(() => {
+          if (v.length > 4) return cb(true);
+          return cb(false);
+        }, 2000);
+      },
+      message: "Author name must be longer than 4 characters."
+    },
+    trim: true
+  },
   date: { type: String, default: Date.now },
   isPublished: Boolean,
-  price: Number
+  price: {
+    type: Number,
+    min: 1,
+    max: 20,
+    get: v => Math.round(v),
+    set: v => Math.round(v)
+  }
 });
 
 const Course = mongoose.model("Course", courseSchema);
 
 const newCourse = new Course({
-  name: "New Course",
-  tags: ["Math"],
-  author: "Ming",
+  name: "CAD Design",
+  tags: ["Design"],
+  author: "John Peter    ",
   isPublished: false,
-  price: 20
+  price: 15.88
 });
 
-// newCourse.save().then(result => console.log(result));
+newCourse
+  .save()
+  .then(result => console.log(result))
+  .catch(err => {
+    for (field in err.errors) {
+      console.log(err.errors[field].message);
+    }
+  });
+
+return;
 
 // Course.find({ isPublished: true, tags: { $in: ["backend"] } })
 //   .select({ name: 1, author: 1 }) // .select(["name", "author"])
@@ -95,3 +134,11 @@ Course.updateOne(
 // // .then(result => {
 // //   console.log("Course saved: ", result);
 // // });
+
+//Delete a doc
+async function removeCourse(id) {
+  const result = await Course.deleteOne({ _id: id });
+  console.log(result);
+}
+
+removeCourse("5a68fdf95db93f6477053ddd");
